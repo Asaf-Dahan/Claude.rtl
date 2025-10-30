@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Claude RTL Toggle",
-  "version": "2.0.0",
-  "description": "Toggle Claude AI interface between LTR and RTL with a draggable animated button",
+  "version": "2.1.0",
+  "description": "Toggle Claude AI text between LTR and RTL - supports conversations, tables, headings, artifacts, and history",
   "permissions": [
     "storage"
   ],

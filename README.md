@@ -4,16 +4,29 @@ A beautiful Chrome extension that allows you to toggle Claude AI's interface bet
 
 ## Features
 
+### User Interface
 - **Easy Toggle**: Beautiful floating button with smooth animations
 - **Draggable Button**: Move the button anywhere on screen - position is saved!
-- **Compact Design**: Small 45px button that doesn't obstruct your view
-- **Smart Detection**: Automatically applies RTL to all Claude elements (conversations, dialogs, search, history)
-- **Persistent Settings**: Remembers your preference and button position across sessions
+- **Compact Design**: Small 45px button that doesn't obstruct your view (40px on mobile)
 - **Keyboard Shortcut**: Quick toggle with `Ctrl+Shift+D`
 - **Pure CSS**: No external assets required - all styling and icons generated via code
-- **Responsive**: Works on all screen sizes (40px on mobile)
 - **Accessible**: Full keyboard support and screen reader friendly
+
+### Smart RTL Application (v2.1.0)
+- **Text-Only Conversion**: Changes ONLY text direction, preserves all layouts
+- **Comprehensive Coverage**: All text elements including:
+  - ✅ Conversations (user and Claude messages)
+  - ✅ **Tables** (headers AND cells) - NEW in v2.1.0!
+  - ✅ **Subtitles and Headings** (h1-h6) - Enhanced in v2.1.0!
+  - ✅ Artifacts content
+  - ✅ Dialogs and modals
+  - ✅ History items
+  - ✅ Text formatting (bold, italic, emphasis)
+  - ✅ Lists, blockquotes, captions
+  - ✅ Chat input textarea
+- **Layout Preservation**: Buttons, navigation, and windows stay in place
 - **Performance Optimized**: Throttled updates prevent page slowdowns
+- **Persistent Settings**: Remembers your preference and button position across sessions
 
 ## Installation
 
@@ -91,6 +104,53 @@ You can modify the button position by editing `styles.css`:
 - Chrome 88+
 - Edge 88+
 - Any Chromium-based browser supporting Manifest V3
+
+## Changelog
+
+### v2.1.0 (2025) - Enhanced Table and Subtitle Support 🎉
+**NEW FEATURES:**
+- ✨ **Full Table Support**: Table headers (th) and cells (td) now properly convert to RTL
+- ✨ **Enhanced Subtitle Coverage**: All heading levels (h1-h6) and role="heading" elements
+- ✨ **Text Formatting**: Bold, italic, emphasis, mark, small, and other text formatting elements
+- ✨ **Additional Elements**: Blockquotes, captions, labels, legends, time, cite, and more
+- 📊 **Better Logging**: Console shows count of affected elements for debugging
+
+**IMPROVEMENTS:**
+- 🎯 Expanded selector coverage to 100+ text element types
+- 💪 Stronger CSS rules for table RTL handling
+- 🔧 Blockquotes now show right border in RTL mode
+- 📝 Better documentation and feature list
+
+### v2.0.0 (2025) - TEXT ONLY Revolution
+**BREAKING CHANGES:**
+- 🔄 Complete rewrite: Only text direction changes, no layout modifications
+- 🎯 Surgical targeting of text elements (p, span, li, h1-h6, textarea)
+- 🚫 Never touches layout containers (div, main, section, article)
+
+**FIXES:**
+- ✅ Artifact windows no longer move
+- ✅ Buttons stay in correct positions
+- ✅ Navigation preserved
+- ✅ Overall layout intact
+
+### v1.3.0 (2025) - Comprehensive Coverage Attempt
+- Attempted broad RTL application (caused layout issues)
+- Led to v2.0.0 complete rewrite
+
+### v1.2.0 (2025) - Selective Application
+- Tried selective RTL targeting
+- Still had layout shifting issues
+
+### v1.1.0 (2025) - Draggable Button
+- ✨ Added drag-and-drop functionality
+- 💾 Position persistence
+- ⚡ Performance improvements
+- 🐛 Fixed page crash issues
+
+### v1.0.0 (2025) - Initial Release
+- 🎉 First release
+- Basic RTL toggle functionality
+- Floating button with animations
 
 ## License
 

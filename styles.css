@@ -192,6 +192,53 @@
   /* Just a marker class, no styles */
 }
 
+/* Table-specific RTL handling */
+/* Keep table structure LTR but allow cell content to be RTL */
+table {
+  direction: ltr !important;
+}
+
+/* Table cells with RTL text */
+th.rtl-text,
+td.rtl-text {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Ensure headings look good in RTL */
+h1.rtl-text,
+h2.rtl-text,
+h3.rtl-text,
+h4.rtl-text,
+h5.rtl-text,
+h6.rtl-text,
+[role="heading"].rtl-text {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* List items in RTL */
+li.rtl-text {
+  text-align: right !important;
+  direction: rtl !important;
+}
+
+/* Strong and emphasis elements */
+strong.rtl-text,
+b.rtl-text,
+em.rtl-text,
+i.rtl-text {
+  direction: rtl !important;
+}
+
+/* Blockquotes in RTL */
+blockquote.rtl-text {
+  text-align: right !important;
+  direction: rtl !important;
+  border-left: none;
+  border-right: 4px solid currentColor;
+}
+
 /* CRITICAL: Ensure NO layout elements get direction applied */
 /* Force LTR on all structural and UI elements */
 body,

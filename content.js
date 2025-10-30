@@ -214,40 +214,107 @@
       // Only apply to leaf text nodes and text-containing elements
 
       const textOnlySelectors = [
-        // Direct text in messages - only paragraphs and spans WITH text
+        // Direct text in messages - paragraphs and spans
         '.font-user-message p',
         '.font-claude-message p',
         '.font-user-message span',
         '.font-claude-message span',
+        '.font-user-message strong',
+        '.font-claude-message strong',
+        '.font-user-message em',
+        '.font-claude-message em',
 
         // Text in any message container
         '[class*="message"] p',
         '[class*="Message"] p',
         '[data-testid*="message"] p',
+        '[class*="message"] span',
+        '[class*="message"] strong',
+        '[class*="message"] em',
 
-        // Headings
+        // All headings and subtitles
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+        '[role="heading"]',
 
-        // List items text
+        // List items
         'li',
+
+        // Table elements - CRITICAL for tables
+        'th',  // Table headers
+        'td',  // Table cells
+        'caption',  // Table captions
+        'thead th',
+        'tbody td',
+        'tfoot td',
+
+        // Text formatting elements
+        'strong',
+        'b',
+        'em',
+        'i',
+        'u',
+        'mark',
+        'small',
+        'del',
+        'ins',
+        'sub',
+        'sup',
+
+        // Other text containers
+        'blockquote',
+        'figcaption',
+        'legend',
+        'label',
+        'time',
+        'address',
+        'cite',
+        'q',
 
         // Text in dialogs
         '[role="dialog"] p',
         '[role="dialog"] span',
         '[role="dialog"] li',
+        '[role="dialog"] h1',
+        '[role="dialog"] h2',
+        '[role="dialog"] h3',
+        '[role="dialog"] strong',
+        '[role="dialog"] td',
+        '[role="dialog"] th',
 
-        // Artifacts text content only
+        // Artifacts text content - comprehensive
         '[class*="artifact"] p',
         '[class*="artifact"] span',
         '[class*="artifact"] li',
+        '[class*="artifact"] h1',
+        '[class*="artifact"] h2',
+        '[class*="artifact"] h3',
+        '[class*="artifact"] h4',
+        '[class*="artifact"] strong',
+        '[class*="artifact"] td',
+        '[class*="artifact"] th',
+        '[class*="artifact"] caption',
+        '[class*="artifact"] blockquote',
 
         // History items text
         '[class*="history"] p',
         '[class*="history"] span',
+        '[class*="history"] strong',
 
-        // Textarea (chat input)
+        // Prose content (common in Claude)
+        '.prose p',
+        '.prose li',
+        '.prose h1',
+        '.prose h2',
+        '.prose h3',
+        '.prose th',
+        '.prose td',
+        '.prose blockquote',
+        '.prose span',
+
+        // Text input areas
         'textarea',
-        'div[contenteditable="true"]'
+        'div[contenteditable="true"]',
+        'input[type="text"]'
       ];
 
       textOnlySelectors.forEach(selector => {
@@ -302,7 +369,9 @@
       // Save preference
       chrome.storage.sync.set({ [STORAGE_KEY]: rtl });
 
-      console.log('Claude RTL: Applied', rtl ? 'RTL' : 'LTR', 'to text elements');
+      // Count affected elements for logging
+      const affectedElements = document.querySelectorAll('.rtl-text').length;
+      console.log(`Claude RTL: Applied ${rtl ? 'RTL' : 'LTR'} to ${affectedElements} text elements (including tables, headings, and text formatting)`);
     } catch (e) {
       console.error('Claude RTL: Error applying direction', e);
     }
