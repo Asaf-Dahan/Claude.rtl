@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Claude RTL Toggle",
+  "version": "1.0.0",
+  "description": "Toggle Claude AI interface between LTR and RTL with a beautiful animated button",
+  "permissions": [
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://claude.ai/*"
+      ],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "icons": {
+    "16": "icon16.html",
+    "48": "icon48.html",
+    "128": "icon128.html"
+  },
+  "action": {
+    "default_title": "Claude RTL Toggle"
+  }
+}

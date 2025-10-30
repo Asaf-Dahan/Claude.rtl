@@ -1,0 +1,288 @@
+/* Claude RTL Toggle Extension Styles */
+
+/* Toggle Button */
+.claude-rtl-toggle {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 999999;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+              0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  -webkit-user-select: none;
+  animation: slideIn 0.5s ease-out;
+}
+
+/* Slide in animation on load */
+@keyframes slideIn {
+  from {
+    transform: translateY(100px) scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Hover effect */
+.claude-rtl-toggle:hover {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4),
+              0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* Active state */
+.claude-rtl-toggle:active {
+  transform: scale(0.95);
+}
+
+/* When RTL is active */
+.claude-rtl-toggle.active {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  animation: pulse 0.6s ease-out;
+}
+
+/* Pulse animation when toggled */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Toggle inner container */
+.toggle-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Icon styles */
+.claude-rtl-toggle svg {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  color: white;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* LTR icon - visible by default */
+.claude-rtl-toggle .icon-ltr {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* RTL icon - hidden by default */
+.claude-rtl-toggle .icon-rtl {
+  opacity: 0;
+  transform: rotate(-180deg) scale(0);
+}
+
+/* When active (RTL mode) */
+.claude-rtl-toggle.active .icon-ltr {
+  opacity: 0;
+  transform: rotate(180deg) scale(0);
+}
+
+.claude-rtl-toggle.active .icon-rtl {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+/* Ripple effect on click */
+.claude-rtl-toggle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.claude-rtl-toggle:active::before {
+  width: 100px;
+  height: 100px;
+  opacity: 0;
+  transition: width 0.6s, height 0.6s, opacity 0.6s;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.claude-rtl-toggle:hover {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Stop float animation during click */
+.claude-rtl-toggle:active {
+  animation: none;
+}
+
+/* RTL mode adjustments */
+.rtl-mode {
+  text-align: right !important;
+}
+
+/* Smooth transition for all direction changes */
+* {
+  transition: direction 0.3s ease;
+}
+
+/* Fix for Claude-specific elements */
+.rtl-mode pre,
+.rtl-mode code {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Ensure code blocks stay LTR */
+[dir="rtl"] pre,
+[dir="rtl"] code,
+.rtl-mode pre code {
+  direction: ltr !important;
+  text-align: left !important;
+  unicode-bidi: embed;
+}
+
+/* Tooltip on hover */
+.claude-rtl-toggle::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.claude-rtl-toggle:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+/* Glow effect */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                0 0 20px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                0 0 30px rgba(102, 126, 234, 0.6);
+  }
+}
+
+.claude-rtl-toggle.active {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .claude-rtl-toggle {
+    width: 50px;
+    height: 50px;
+    bottom: 20px;
+    right: 20px;
+  }
+
+  .claude-rtl-toggle svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .claude-rtl-toggle {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4),
+                0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* Accessibility - High contrast mode */
+@media (prefers-contrast: high) {
+  .claude-rtl-toggle {
+    border: 2px solid white;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .claude-rtl-toggle,
+  .claude-rtl-toggle *,
+  .claude-rtl-toggle::before,
+  .claude-rtl-toggle::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.claude-rtl-toggle:focus {
+  outline: 3px solid rgba(102, 126, 234, 0.5);
+  outline-offset: 3px;
+}
+
+.claude-rtl-toggle:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Direction transition for content */
+.rtl-mode,
+[dir="rtl"] {
+  transition: all 0.3s ease;
+}
+
+/* Ensure proper alignment in RTL */
+.rtl-mode input,
+.rtl-mode textarea {
+  text-align: right;
+}
+
+.rtl-mode button {
+  direction: inherit;
+}
+
+/* Claude-specific fixes */
+.rtl-mode .font-mono,
+.rtl-mode .font-code {
+  direction: ltr !important;
+  text-align: left !important;
+}
