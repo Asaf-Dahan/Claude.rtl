@@ -217,7 +217,8 @@
   // Check if element is a text-bearing element
   function isTextElement(element) {
     const textTags = [
-      'P', 'SPAN', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+      // ONLY text elements - NO layout containers like DIV!
+      'P', 'SPAN', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
       'LI', 'TD', 'TH', 'CAPTION', 'LABEL', 'LEGEND',
       'STRONG', 'B', 'EM', 'I', 'U', 'MARK', 'SMALL',
       'BLOCKQUOTE', 'Q', 'CITE', 'TIME', 'ADDRESS',

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Claude RTL Toggle",
-  "version": "2.2.0",
-  "description": "Aggressive RTL toggle for Claude AI - walks entire DOM to convert ALL text elements including tables and headings",
+  "version": "2.2.1",
+  "description": "Smart RTL toggle for Claude AI - converts text elements (P, SPAN, H1-H6, TH, TD) while preserving layout containers",
   "permissions": [
     "storage"
   ],
