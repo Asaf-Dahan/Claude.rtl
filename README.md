@@ -31,9 +31,9 @@ The extension is ready to be uploaded to the Chrome Web Store:
    - manifest.json
    - content.js
    - styles.css
-   - icon16.html
-   - icon48.html
-   - icon128.html
+   - icon16.svg
+   - icon48.svg
+   - icon128.svg
 
 2. Go to [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
 3. Click "New Item"
