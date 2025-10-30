@@ -1,4 +1,4 @@
-// Claude RTL Toggle Extension - Fixed and Enhanced
+// Claude RTL Toggle Extension - TEXT ONLY VERSION
 (function() {
   'use strict';
 
@@ -25,7 +25,6 @@
       button.setAttribute('title', 'Toggle LTR/RTL (Drag to move)');
       button.setAttribute('tabindex', '0');
 
-      // Create inner content with SVG icons
       button.innerHTML = `
         <div class="toggle-inner">
           <svg class="icon-ltr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -38,13 +37,8 @@
       `;
 
       document.body.appendChild(button);
-
-      // Load saved position
       loadButtonPosition(button);
-
-      // Setup drag functionality
       setupDragging(button);
-
       return button;
     } catch (e) {
       console.error('Claude RTL: Error creating button', e);
@@ -54,7 +48,6 @@
 
   // Setup dragging functionality
   function setupDragging(button) {
-    let clickTimeout = null;
     let hasMoved = false;
 
     button.addEventListener('mousedown', (e) => {
@@ -81,7 +74,6 @@
       let newX = buttonStartX + deltaX;
       let newY = buttonStartY + deltaY;
 
-      // Keep button within viewport
       const maxX = window.innerWidth - button.offsetWidth;
       const maxY = window.innerHeight - button.offsetHeight;
 
@@ -99,18 +91,15 @@
         isDragging = false;
         button.classList.remove('dragging');
 
-        // Save position
         const rect = button.getBoundingClientRect();
         saveButtonPosition(rect.left, rect.top);
 
-        // If didn't move much, treat as click
         if (!hasMoved || (Math.abs(e.clientX - dragStartX) < 5 && Math.abs(e.clientY - dragStartY) < 5)) {
           toggleDirection();
         }
       }
     });
 
-    // Touch support for mobile
     button.addEventListener('touchstart', (e) => {
       const touch = e.touches[0];
       isDragging = true;
@@ -162,7 +151,6 @@
       }
     });
 
-    // Keyboard accessibility
     button.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -174,9 +162,7 @@
   // Save button position
   function saveButtonPosition(x, y) {
     try {
-      chrome.storage.sync.set({
-        [POSITION_KEY]: { x, y }
-      });
+      chrome.storage.sync.set({ [POSITION_KEY]: { x, y } });
     } catch (e) {
       console.error('Claude RTL: Error saving position', e);
     }
@@ -199,122 +185,103 @@
     }
   }
 
-  // Apply RTL/LTR direction
+  // Check if element contains actual text (not just whitespace)
+  function hasTextContent(element) {
+    if (!element) return false;
+
+    // Check if element has direct text nodes with content
+    for (let node of element.childNodes) {
+      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Apply RTL/LTR direction - TEXT ONLY, NO LAYOUT CHANGES
   function applyDirection(rtl) {
     try {
       isRTL = rtl;
-      const direction = rtl ? 'rtl' : 'ltr';
 
-      // Strategy: Apply RTL broadly to content, then exclude UI elements
-      // This catches all conversations, history, artifacts while preserving layout
-
-      // First, get the main conversation area and apply broadly
-      const mainContent = document.querySelector('main');
-      if (mainContent) {
-        // Apply to main content container itself
-        mainContent.style.direction = direction;
-        mainContent.setAttribute('dir', direction);
+      // Add/remove global class for CSS targeting
+      if (rtl) {
+        document.documentElement.classList.add('claude-rtl-active');
+      } else {
+        document.documentElement.classList.remove('claude-rtl-active');
       }
 
-      // Broad selectors for ALL content (conversations, history, artifacts, dialogs)
-      const contentSelectors = [
-        // ALL message-related elements
-        '[data-testid*="message"]',
-        '[data-testid*="conversation"]',
-        '[class*="message"]',
-        '[class*="Message"]',
-        '.font-user-message',
-        '.font-claude-message',
+      // STRATEGY: Only target TEXT elements, never layout containers
+      // Only apply to leaf text nodes and text-containing elements
 
-        // Main content areas
-        'main',
-        'main > div',
-        'main article',
-        'main section',
+      const textOnlySelectors = [
+        // Direct text in messages - only paragraphs and spans WITH text
+        '.font-user-message p',
+        '.font-claude-message p',
+        '.font-user-message span',
+        '.font-claude-message span',
 
-        // Dialog content
-        '[role="dialog"]',
-        '[role="dialog"] *',
+        // Text in any message container
+        '[class*="message"] p',
+        '[class*="Message"] p',
+        '[data-testid*="message"] p',
 
-        // Text areas
+        // Headings
+        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+
+        // List items text
+        'li',
+
+        // Text in dialogs
+        '[role="dialog"] p',
+        '[role="dialog"] span',
+        '[role="dialog"] li',
+
+        // Artifacts text content only
+        '[class*="artifact"] p',
+        '[class*="artifact"] span',
+        '[class*="artifact"] li',
+
+        // History items text
+        '[class*="history"] p',
+        '[class*="history"] span',
+
+        // Textarea (chat input)
         'textarea',
-        'div[contenteditable="true"]',
-
-        // All artifacts
-        '[class*="artifact"]',
-        '[class*="Artifact"]',
-        '[class*="artifact"] *',
-
-        // History items (conversation list)
-        '[class*="history"]',
-        '[class*="History"]',
-        '[class*="conversation-item"]',
-        '[class*="chat-item"]',
-
-        // Prose and text content
-        '.prose',
-        '.prose *',
-        'p',
-        'div',
-        'span',
-        'article',
-        'section'
+        'div[contenteditable="true"]'
       ];
 
-      // Apply direction broadly
-      contentSelectors.forEach(selector => {
+      textOnlySelectors.forEach(selector => {
         try {
           const elements = document.querySelectorAll(selector);
           elements.forEach(element => {
-            // EXCLUSIONS: Skip these elements to preserve UI
-            // Navigation and structural elements
-            if (element.id === 'claude-rtl-toggle' ||
-                element.closest('#claude-rtl-toggle') ||
-                element.matches('nav') ||
-                element.matches('nav *') ||
-                element.closest('nav') ||
-                element.matches('[role="navigation"]') ||
-                element.matches('[role="navigation"] *') ||
-                element.matches('header') ||
-                element.matches('header *') ||
-                element.matches('footer') ||
-                element.matches('footer *')) {
-              return;
-            }
-
-            // Skip buttons (but not their containers)
-            if (element.matches('button') ||
-                element.matches('[role="button"]') ||
-                element.matches('button *') ||
-                element.matches('[role="button"] *')) {
-              return;
-            }
+            // Skip toggle button
+            if (element.closest('#claude-rtl-toggle')) return;
 
             // Skip code blocks
-            if (element.matches('pre') ||
-                element.matches('code') ||
-                element.matches('pre *') ||
-                element.matches('code *') ||
-                element.closest('pre') ||
-                element.closest('code')) {
-              return;
-            }
+            if (element.closest('pre') || element.closest('code')) return;
 
-            // Skip input controls (but allow textarea for chat)
-            if ((element.matches('input') && element.type !== 'text') ||
-                element.matches('select') ||
-                element.matches('option')) {
-              return;
-            }
+            // Skip buttons
+            if (element.closest('button')) return;
 
-            // Apply direction
-            element.style.direction = direction;
-            element.setAttribute('dir', direction);
+            // Skip navigation
+            if (element.closest('nav')) return;
 
-            if (rtl) {
-              element.classList.add('rtl-mode');
-            } else {
-              element.classList.remove('rtl-mode');
+            // Only apply to elements that have text content
+            if (selector.includes('textarea') ||
+                selector.includes('contenteditable') ||
+                hasTextContent(element) ||
+                element.textContent.trim().length > 0) {
+
+              // Apply only text-align, not direction on container
+              if (rtl) {
+                element.style.textAlign = 'right';
+                element.style.direction = 'rtl';
+                element.classList.add('rtl-text');
+              } else {
+                element.style.textAlign = 'left';
+                element.style.direction = 'ltr';
+                element.classList.remove('rtl-text');
+              }
             }
           });
         } catch (e) {
@@ -334,6 +301,8 @@
 
       // Save preference
       chrome.storage.sync.set({ [STORAGE_KEY]: rtl });
+
+      console.log('Claude RTL: Applied', rtl ? 'RTL' : 'LTR', 'to text elements');
     } catch (e) {
       console.error('Claude RTL: Error applying direction', e);
     }
@@ -357,7 +326,7 @@
     }
   }
 
-  // Throttle function to limit execution rate
+  // Throttle function
   function throttle(func, limit) {
     let inThrottle;
     return function() {
@@ -371,14 +340,14 @@
     };
   }
 
-  // Observe DOM changes with throttling
+  // Observe DOM changes
   function observeDOM() {
     try {
       const throttledApply = throttle(() => {
         if (isRTL) {
           applyDirection(true);
         }
-      }, 500);
+      }, 1000); // Increased to 1 second for better performance
 
       const observer = new MutationObserver(throttledApply);
 
@@ -394,28 +363,21 @@
   // Initialize extension
   function init() {
     try {
-      // Wait for DOM to be ready
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
         return;
       }
 
-      // Wait a bit for Claude to load
       setTimeout(() => {
-        // Create and attach button
         const button = createToggleButton();
         if (!button) {
           console.error('Claude RTL: Failed to create button');
           return;
         }
 
-        // Load saved preference
         loadPreference();
-
-        // Observe DOM changes with throttling
         observeDOM();
 
-        // Add keyboard shortcut (Ctrl+Shift+D)
         document.addEventListener('keydown', (e) => {
           if (e.ctrlKey && e.shiftKey && e.key === 'D') {
             e.preventDefault();
@@ -423,7 +385,7 @@
           }
         });
 
-        console.log('Claude RTL Toggle: Initialized successfully');
+        console.log('Claude RTL Toggle: Initialized (TEXT ONLY mode)');
       }, 1000);
     } catch (e) {
       console.error('Claude RTL: Initialization error', e);

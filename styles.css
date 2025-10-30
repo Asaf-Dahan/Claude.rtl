@@ -181,64 +181,62 @@
   opacity: 1;
 }
 
-/* RTL mode adjustments - for content text */
-.rtl-mode {
+/* RTL text class - only affects text alignment and direction */
+.rtl-text {
   text-align: right !important;
+  direction: rtl !important;
 }
 
-/* CRITICAL: Keep UI elements and navigation LTR */
-/* These rules MUST override any RTL applied to prevent layout breaking */
+/* Global class when RTL is active */
+.claude-rtl-active {
+  /* Just a marker class, no styles */
+}
+
+/* CRITICAL: Ensure NO layout elements get direction applied */
+/* Force LTR on all structural and UI elements */
+body,
+html,
+main,
+div:not(.rtl-text),
+section,
+article,
 nav,
 nav *,
-[role="navigation"],
-[role="navigation"] *,
 aside,
 aside *,
+header,
+header *,
+footer,
+footer *,
+button,
+button *,
+[role="button"],
+[role="button"] *,
+[role="navigation"],
+[role="navigation"] *,
 [class*="sidebar"],
 [class*="sidebar"] *,
 [class*="Sidebar"],
 [class*="Sidebar"] *,
 [class*="menu"],
-[class*="menu"] *,
 [class*="Menu"],
-[class*="Menu"] *,
-button,
-button *,
-[role="button"],
-[role="button"] *,
-header,
-header *,
-footer,
-footer *,
 [class*="toolbar"],
-[class*="toolbar"] *,
 [class*="Toolbar"],
-[class*="Toolbar"] *,
 [class*="navigation"],
-[class*="navigation"] *,
 [class*="Navigation"],
-[class*="Navigation"] *,
-[type="submit"],
-[type="button"],
-[class*="icon"],
-[class*="Icon"],
-svg:not(.icon-ltr):not(.icon-rtl) {
-  direction: ltr !important;
-  text-align: left !important;
-}
-
-/* Keep body LTR - main will handle content direction */
-body,
-html,
-#root,
-[id*="app"],
-[id*="App"] {
+form,
+input:not([type="text"]),
+select,
+svg:not(.icon-ltr):not(.icon-rtl),
+img,
+video,
+iframe {
   direction: ltr !important;
 }
 
-/* Remove global transition that might cause issues */
+/* Remove any global transitions */
 * {
-  /* Removed: transition: direction 0.3s ease; - causes layout issues */
+  /* No global transitions */
 }
 
 /* Fix for Claude-specific elements - Keep code LTR */
