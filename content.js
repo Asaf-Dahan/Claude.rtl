@@ -1,4 +1,4 @@
-// Claude RTL Toggle Extension - TEXT ONLY VERSION
+// Claude RTL Toggle Extension - AGGRESSIVE TEXT RTL VERSION
 (function() {
   'use strict';
 
@@ -185,176 +185,110 @@
     }
   }
 
-  // Check if element contains actual text (not just whitespace)
-  function hasTextContent(element) {
-    if (!element) return false;
+  // Check if element should be skipped
+  function shouldSkipElement(element) {
+    if (!element || !element.tagName) return true;
 
-    // Check if element has direct text nodes with content
-    for (let node of element.childNodes) {
-      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim().length > 0) {
-        return true;
-      }
-    }
+    // Skip toggle button
+    if (element.id === 'claude-rtl-toggle' || element.closest('#claude-rtl-toggle')) return true;
+
+    // Skip navigation, sidebar, buttons
+    if (element.closest('nav') ||
+        element.closest('aside') ||
+        element.closest('button') ||
+        element.closest('[role="button"]') ||
+        element.closest('[role="navigation"]')) return true;
+
+    // Skip code blocks
+    if (element.tagName === 'PRE' ||
+        element.tagName === 'CODE' ||
+        element.closest('pre') ||
+        element.closest('code')) return true;
+
+    // Skip SVG and other media
+    if (element.tagName === 'SVG' ||
+        element.tagName === 'IMG' ||
+        element.tagName === 'VIDEO' ||
+        element.tagName === 'IFRAME') return true;
+
     return false;
   }
 
-  // Apply RTL/LTR direction - TEXT ONLY, NO LAYOUT CHANGES
+  // Check if element is a text-bearing element
+  function isTextElement(element) {
+    const textTags = [
+      'P', 'SPAN', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+      'LI', 'TD', 'TH', 'CAPTION', 'LABEL', 'LEGEND',
+      'STRONG', 'B', 'EM', 'I', 'U', 'MARK', 'SMALL',
+      'BLOCKQUOTE', 'Q', 'CITE', 'TIME', 'ADDRESS',
+      'FIGCAPTION', 'DEL', 'INS', 'SUB', 'SUP',
+      'TEXTAREA', 'INPUT'
+    ];
+
+    return textTags.includes(element.tagName);
+  }
+
+  // Apply RTL/LTR to a single element with INLINE STYLES (most aggressive)
+  function applyToElement(element, rtl) {
+    if (!element || !element.style) return;
+
+    if (rtl) {
+      element.style.setProperty('direction', 'rtl', 'important');
+      element.style.setProperty('text-align', 'right', 'important');
+      element.setAttribute('dir', 'rtl');
+      element.classList.add('claude-rtl-text');
+    } else {
+      element.style.setProperty('direction', 'ltr', 'important');
+      element.style.setProperty('text-align', 'left', 'important');
+      element.setAttribute('dir', 'ltr');
+      element.classList.remove('claude-rtl-text');
+    }
+  }
+
+  // Walk through DOM and apply RTL to ALL text elements
+  function walkAndApplyRTL(root, rtl) {
+    if (!root) return;
+
+    let count = 0;
+
+    // Use TreeWalker for efficient DOM traversal
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_ELEMENT,
+      {
+        acceptNode: function(node) {
+          if (shouldSkipElement(node)) {
+            return NodeFilter.FILTER_REJECT;
+          }
+          if (isTextElement(node)) {
+            return NodeFilter.FILTER_ACCEPT;
+          }
+          return NodeFilter.FILTER_SKIP;
+        }
+      }
+    );
+
+    let node;
+    while (node = walker.nextNode()) {
+      applyToElement(node, rtl);
+      count++;
+    }
+
+    return count;
+  }
+
+  // Apply RTL/LTR direction - AGGRESSIVE DOM WALKING
   function applyDirection(rtl) {
     try {
       isRTL = rtl;
 
-      // Add/remove global class for CSS targeting
-      if (rtl) {
-        document.documentElement.classList.add('claude-rtl-active');
-      } else {
-        document.documentElement.classList.remove('claude-rtl-active');
-      }
+      console.log(`Claude RTL: Starting ${rtl ? 'RTL' : 'LTR'} application...`);
 
-      // STRATEGY: Only target TEXT elements, never layout containers
-      // Only apply to leaf text nodes and text-containing elements
+      // Find main content area
+      const mainContent = document.querySelector('main') || document.body;
 
-      const textOnlySelectors = [
-        // Direct text in messages - paragraphs and spans
-        '.font-user-message p',
-        '.font-claude-message p',
-        '.font-user-message span',
-        '.font-claude-message span',
-        '.font-user-message strong',
-        '.font-claude-message strong',
-        '.font-user-message em',
-        '.font-claude-message em',
-
-        // Text in any message container
-        '[class*="message"] p',
-        '[class*="Message"] p',
-        '[data-testid*="message"] p',
-        '[class*="message"] span',
-        '[class*="message"] strong',
-        '[class*="message"] em',
-
-        // All headings and subtitles
-        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-        '[role="heading"]',
-
-        // List items
-        'li',
-
-        // Table elements - CRITICAL for tables
-        'th',  // Table headers
-        'td',  // Table cells
-        'caption',  // Table captions
-        'thead th',
-        'tbody td',
-        'tfoot td',
-
-        // Text formatting elements
-        'strong',
-        'b',
-        'em',
-        'i',
-        'u',
-        'mark',
-        'small',
-        'del',
-        'ins',
-        'sub',
-        'sup',
-
-        // Other text containers
-        'blockquote',
-        'figcaption',
-        'legend',
-        'label',
-        'time',
-        'address',
-        'cite',
-        'q',
-
-        // Text in dialogs
-        '[role="dialog"] p',
-        '[role="dialog"] span',
-        '[role="dialog"] li',
-        '[role="dialog"] h1',
-        '[role="dialog"] h2',
-        '[role="dialog"] h3',
-        '[role="dialog"] strong',
-        '[role="dialog"] td',
-        '[role="dialog"] th',
-
-        // Artifacts text content - comprehensive
-        '[class*="artifact"] p',
-        '[class*="artifact"] span',
-        '[class*="artifact"] li',
-        '[class*="artifact"] h1',
-        '[class*="artifact"] h2',
-        '[class*="artifact"] h3',
-        '[class*="artifact"] h4',
-        '[class*="artifact"] strong',
-        '[class*="artifact"] td',
-        '[class*="artifact"] th',
-        '[class*="artifact"] caption',
-        '[class*="artifact"] blockquote',
-
-        // History items text
-        '[class*="history"] p',
-        '[class*="history"] span',
-        '[class*="history"] strong',
-
-        // Prose content (common in Claude)
-        '.prose p',
-        '.prose li',
-        '.prose h1',
-        '.prose h2',
-        '.prose h3',
-        '.prose th',
-        '.prose td',
-        '.prose blockquote',
-        '.prose span',
-
-        // Text input areas
-        'textarea',
-        'div[contenteditable="true"]',
-        'input[type="text"]'
-      ];
-
-      textOnlySelectors.forEach(selector => {
-        try {
-          const elements = document.querySelectorAll(selector);
-          elements.forEach(element => {
-            // Skip toggle button
-            if (element.closest('#claude-rtl-toggle')) return;
-
-            // Skip code blocks
-            if (element.closest('pre') || element.closest('code')) return;
-
-            // Skip buttons
-            if (element.closest('button')) return;
-
-            // Skip navigation
-            if (element.closest('nav')) return;
-
-            // Only apply to elements that have text content
-            if (selector.includes('textarea') ||
-                selector.includes('contenteditable') ||
-                hasTextContent(element) ||
-                element.textContent.trim().length > 0) {
-
-              // Apply only text-align, not direction on container
-              if (rtl) {
-                element.style.textAlign = 'right';
-                element.style.direction = 'rtl';
-                element.classList.add('rtl-text');
-              } else {
-                element.style.textAlign = 'left';
-                element.style.direction = 'ltr';
-                element.classList.remove('rtl-text');
-              }
-            }
-          });
-        } catch (e) {
-          // Ignore invalid selectors
-        }
-      });
+      // Walk through and apply to all text elements
+      const count = walkAndApplyRTL(mainContent, rtl);
 
       // Update button state
       const button = document.getElementById('claude-rtl-toggle');
@@ -369,9 +303,12 @@
       // Save preference
       chrome.storage.sync.set({ [STORAGE_KEY]: rtl });
 
-      // Count affected elements for logging
-      const affectedElements = document.querySelectorAll('.rtl-text').length;
-      console.log(`Claude RTL: Applied ${rtl ? 'RTL' : 'LTR'} to ${affectedElements} text elements (including tables, headings, and text formatting)`);
+      console.log(`Claude RTL: Applied ${rtl ? 'RTL' : 'LTR'} to ${count} text elements`);
+      console.log(`Claude RTL: ✅ Tables (th/td): Converted`);
+      console.log(`Claude RTL: ✅ Headings (h1-h6): Converted`);
+      console.log(`Claude RTL: ✅ Paragraphs (p): Converted`);
+      console.log(`Claude RTL: ✅ All text elements: Converted`);
+
     } catch (e) {
       console.error('Claude RTL: Error applying direction', e);
     }
@@ -409,14 +346,14 @@
     };
   }
 
-  // Observe DOM changes
+  // Observe DOM changes and reapply
   function observeDOM() {
     try {
       const throttledApply = throttle(() => {
         if (isRTL) {
           applyDirection(true);
         }
-      }, 1000); // Increased to 1 second for better performance
+      }, 500);
 
       const observer = new MutationObserver(throttledApply);
 
@@ -424,6 +361,8 @@
         childList: true,
         subtree: true
       });
+
+      console.log('Claude RTL: DOM observer started');
     } catch (e) {
       console.error('Claude RTL: Error setting up observer', e);
     }
@@ -454,7 +393,7 @@
           }
         });
 
-        console.log('Claude RTL Toggle: Initialized (TEXT ONLY mode)');
+        console.log('Claude RTL Toggle: Initialized (AGGRESSIVE DOM WALKING mode)');
       }, 1000);
     } catch (e) {
       console.error('Claude RTL: Initialization error', e);

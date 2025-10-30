@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Claude RTL Toggle",
-  "version": "2.1.0",
-  "description": "Toggle Claude AI text between LTR and RTL - supports conversations, tables, headings, artifacts, and history",
+  "version": "2.2.0",
+  "description": "Aggressive RTL toggle for Claude AI - walks entire DOM to convert ALL text elements including tables and headings",
   "permissions": [
     "storage"
   ],
