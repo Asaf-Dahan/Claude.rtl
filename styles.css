@@ -1,19 +1,22 @@
-/* Claude RTL Toggle Extension Styles */
+/* Claude RTL Toggle Extension Styles - Enhanced with Drag Support */
 
-/* Toggle Button */
+/* Toggle Button - Smaller and Draggable */
 .claude-rtl-toggle {
   position: fixed;
   bottom: 30px;
   right: 30px;
-  width: 60px;
-  height: 60px;
+  width: 45px;
+  height: 45px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
-  cursor: pointer;
+  cursor: move;
+  cursor: grab;
   z-index: 999999;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
               0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -22,34 +25,42 @@
   animation: slideIn 0.5s ease-out;
 }
 
+/* Dragging state */
+.claude-rtl-toggle.dragging {
+  cursor: grabbing;
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3),
+              0 3px 8px rgba(0, 0, 0, 0.2);
+  transition: none;
+}
+
 /* Slide in animation on load */
 @keyframes slideIn {
   from {
-    transform: translateY(100px) scale(0);
+    transform: scale(0) translateY(50px);
     opacity: 0;
   }
   to {
-    transform: translateY(0) scale(1);
+    transform: scale(1) translateY(0);
     opacity: 1;
   }
 }
 
-/* Hover effect */
-.claude-rtl-toggle:hover {
-  transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4),
+/* Hover effect - only when not dragging */
+.claude-rtl-toggle:not(.dragging):hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4),
               0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
-/* Active state */
-.claude-rtl-toggle:active {
+/* Active/Click state */
+.claude-rtl-toggle:not(.dragging):active {
   transform: scale(0.95);
 }
 
 /* When RTL is active */
 .claude-rtl-toggle.active {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  animation: pulse 0.6s ease-out;
 }
 
 /* Pulse animation when toggled */
@@ -73,15 +84,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
-/* Icon styles */
+/* Icon styles - Smaller */
 .claude-rtl-toggle svg {
   position: absolute;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   color: white;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
 /* LTR icon - visible by default */
@@ -118,33 +131,54 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.6);
   transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-
-.claude-rtl-toggle:active::before {
-  width: 100px;
-  height: 100px;
-  opacity: 0;
   transition: width 0.6s, height 0.6s, opacity 0.6s;
+  pointer-events: none;
 }
 
-/* Floating animation */
-@keyframes float {
+.claude-rtl-toggle:not(.dragging):active::before {
+  width: 80px;
+  height: 80px;
+  opacity: 0;
+}
+
+/* Glow effect when RTL is active */
+@keyframes glow {
   0%, 100% {
-    transform: translateY(0px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                0 0 15px rgba(240, 147, 251, 0.4);
   }
   50% {
-    transform: translateY(-10px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
+                0 0 25px rgba(240, 147, 251, 0.6);
   }
 }
 
-.claude-rtl-toggle:hover {
-  animation: float 2s ease-in-out infinite;
+.claude-rtl-toggle.active:not(.dragging) {
+  animation: glow 2s ease-in-out infinite;
 }
 
-/* Stop float animation during click */
-.claude-rtl-toggle:active {
-  animation: none;
+/* Tooltip on hover - only when not dragging */
+.claude-rtl-toggle:not(.dragging)::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  z-index: 1000000;
+}
+
+.claude-rtl-toggle:not(.dragging):hover::after {
+  opacity: 1;
 }
 
 /* RTL mode adjustments */
@@ -152,19 +186,14 @@
   text-align: right !important;
 }
 
-/* Smooth transition for all direction changes */
+/* Remove global transition that might cause issues */
 * {
-  transition: direction 0.3s ease;
+  /* Removed: transition: direction 0.3s ease; - causes layout issues */
 }
 
-/* Fix for Claude-specific elements */
+/* Fix for Claude-specific elements - Keep code LTR */
 .rtl-mode pre,
-.rtl-mode code {
-  direction: ltr !important;
-  text-align: left !important;
-}
-
-/* Ensure code blocks stay LTR */
+.rtl-mode code,
 [dir="rtl"] pre,
 [dir="rtl"] code,
 .rtl-mode pre code {
@@ -173,58 +202,44 @@
   unicode-bidi: embed;
 }
 
-/* Tooltip on hover */
-.claude-rtl-toggle::after {
-  content: attr(title);
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-10px);
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s, transform 0.3s;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+/* Ensure proper alignment in RTL */
+.rtl-mode input,
+.rtl-mode textarea {
+  text-align: right;
 }
 
-.claude-rtl-toggle:hover::after {
-  opacity: 1;
-  transform: translateX(-50%) translateY(-5px);
+.rtl-mode button {
+  direction: inherit;
 }
 
-/* Glow effect */
-@keyframes glow {
-  0%, 100% {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
-                0 0 20px rgba(102, 126, 234, 0.3);
-  }
-  50% {
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2),
-                0 0 30px rgba(102, 126, 234, 0.6);
-  }
+/* Claude-specific fixes - keep monospace content LTR */
+.rtl-mode .font-mono,
+.rtl-mode .font-code,
+[dir="rtl"] .font-mono,
+[dir="rtl"] .font-code {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
-.claude-rtl-toggle.active {
-  animation: glow 2s ease-in-out infinite;
+/* Keep the toggle button itself always LTR */
+#claude-rtl-toggle,
+.claude-rtl-toggle,
+.claude-rtl-toggle * {
+  direction: ltr !important;
 }
 
-/* Responsive design */
+/* Responsive design - Even smaller on mobile */
 @media (max-width: 768px) {
   .claude-rtl-toggle {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     bottom: 20px;
     right: 20px;
   }
 
   .claude-rtl-toggle svg {
-    width: 26px;
-    height: 26px;
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -264,25 +279,13 @@
   outline: none;
 }
 
-/* Direction transition for content */
+/* Smooth transitions for content direction changes */
 .rtl-mode,
 [dir="rtl"] {
   transition: all 0.3s ease;
 }
 
-/* Ensure proper alignment in RTL */
-.rtl-mode input,
-.rtl-mode textarea {
-  text-align: right;
-}
-
-.rtl-mode button {
-  direction: inherit;
-}
-
-/* Claude-specific fixes */
-.rtl-mode .font-mono,
-.rtl-mode .font-code {
-  direction: ltr !important;
+/* Prevent button from being affected by RTL */
+.claude-rtl-toggle {
   text-align: left !important;
 }

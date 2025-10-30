@@ -5,12 +5,15 @@ A beautiful Chrome extension that allows you to toggle Claude AI's interface bet
 ## Features
 
 - **Easy Toggle**: Beautiful floating button with smooth animations
+- **Draggable Button**: Move the button anywhere on screen - position is saved!
+- **Compact Design**: Small 45px button that doesn't obstruct your view
 - **Smart Detection**: Automatically applies RTL to all Claude elements (conversations, dialogs, search, history)
-- **Persistent Settings**: Remembers your preference across sessions
+- **Persistent Settings**: Remembers your preference and button position across sessions
 - **Keyboard Shortcut**: Quick toggle with `Ctrl+Shift+D`
 - **Pure CSS**: No external assets required - all styling and icons generated via code
-- **Responsive**: Works on all screen sizes
+- **Responsive**: Works on all screen sizes (40px on mobile)
 - **Accessible**: Full keyboard support and screen reader friendly
+- **Performance Optimized**: Throttled updates prevent page slowdowns
 
 ## Installation
 
@@ -44,14 +47,15 @@ The extension is ready to be uploaded to the Chrome Web Store:
 ## Usage
 
 1. Visit [claude.ai](https://claude.ai)
-2. Look for the floating button in the bottom-right corner
-3. Click the button to toggle between LTR and RTL
-4. The button will pulse and change color when RTL is active
-5. Your preference is automatically saved
+2. Look for the floating button in the bottom-right corner (purple gradient)
+3. **Click** the button to toggle between LTR and RTL
+4. **Drag** the button to move it anywhere on screen
+5. The button changes to pink and glows when RTL is active
+6. Your preference and button position are automatically saved
 
 ### Keyboard Shortcut
 
-Press `Ctrl+Shift+D` to quickly toggle text direction
+Press `Ctrl+Shift+D` to quickly toggle text direction without clicking
 
 ## How It Works
 
@@ -59,8 +63,10 @@ The extension:
 - Injects a content script that monitors Claude's interface
 - Applies RTL direction to all relevant elements (conversations, dialogs, inputs, etc.)
 - Preserves LTR for code blocks and technical content
-- Uses MutationObserver to handle dynamically loaded content
-- Stores preferences using Chrome's sync storage
+- Uses throttled MutationObserver to handle dynamically loaded content (prevents crashes)
+- Stores preferences and button position using Chrome's sync storage
+- Drag detection with smart click/drag differentiation
+- Touch support for mobile devices
 
 ## Customization
 
