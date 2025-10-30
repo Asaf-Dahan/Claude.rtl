@@ -205,31 +205,69 @@
       isRTL = rtl;
       const direction = rtl ? 'rtl' : 'ltr';
 
-      // Apply to body
-      document.body.style.direction = direction;
-      document.body.setAttribute('dir', direction);
+      // DO NOT apply to body - only to specific content areas!
+      // This prevents breaking the entire layout and navigation
 
-      // Main selectors for Claude interface
-      const selectors = [
-        'main',
-        '[role="main"]',
-        'article',
-        '[role="dialog"]',
-        'textarea',
-        'input[type="text"]',
-        'p',
-        'div[contenteditable]',
+      // Specific selectors for CONTENT ONLY (conversations, dialogs, artifacts)
+      // These are more surgical selectors that target only text content areas
+      const contentSelectors = [
+        // Message content containers
+        '[data-testid*="message"]',
+        '[data-testid*="conversation"]',
         '.font-user-message',
-        '.font-claude-message'
+        '.font-claude-message',
+
+        // Dialog content (not the dialog itself, just content)
+        '[role="dialog"] .prose',
+        '[role="dialog"] p',
+        '[role="dialog"] div[class*="text"]',
+
+        // Text input areas
+        'textarea[placeholder*="Talk"]',
+        'textarea[placeholder*="Reply"]',
+        'div[contenteditable="true"]',
+
+        // Artifact content areas
+        '[class*="artifact"] .prose',
+        '[class*="artifact"] p',
+
+        // Prose content (main text areas)
+        '.prose p',
+        '.prose div',
+
+        // Paragraph elements inside main content (but not in nav/sidebar)
+        'main article p',
+        'main article div[class*="text"]',
+        'main [class*="message"] p',
+        'main [class*="message"] div',
+
+        // Search results
+        '[role="search"] + div p',
+        '[class*="search"] p'
       ];
 
-      // Apply direction to all matching elements
-      selectors.forEach(selector => {
+      // Apply direction to content areas only
+      contentSelectors.forEach(selector => {
         try {
           const elements = document.querySelectorAll(selector);
           elements.forEach(element => {
-            // Skip the toggle button itself
-            if (element.id === 'claude-rtl-toggle' || element.closest('#claude-rtl-toggle')) {
+            // Skip if it's part of navigation, sidebar, or toggle button
+            if (element.id === 'claude-rtl-toggle' ||
+                element.closest('#claude-rtl-toggle') ||
+                element.closest('nav') ||
+                element.closest('[role="navigation"]') ||
+                element.closest('aside') ||
+                element.closest('button') ||
+                element.closest('[class*="sidebar"]') ||
+                element.closest('[class*="menu"]')) {
+              return;
+            }
+
+            // Skip if it's a code block
+            if (element.tagName === 'PRE' ||
+                element.tagName === 'CODE' ||
+                element.closest('pre') ||
+                element.closest('code')) {
               return;
             }
 

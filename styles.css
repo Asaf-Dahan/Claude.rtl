@@ -181,9 +181,34 @@
   opacity: 1;
 }
 
-/* RTL mode adjustments */
+/* RTL mode adjustments - ONLY for text content */
 .rtl-mode {
   text-align: right !important;
+}
+
+/* IMPORTANT: Keep UI elements and navigation LTR */
+/* This prevents breaking the layout */
+nav,
+[role="navigation"],
+aside,
+[class*="sidebar"],
+[class*="menu"],
+button,
+[role="button"],
+header,
+footer,
+[class*="toolbar"],
+[class*="navigation"] {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Keep body and main structural elements LTR */
+body,
+html,
+#root,
+[id*="app"] {
+  direction: ltr !important;
 }
 
 /* Remove global transition that might cause issues */
@@ -196,27 +221,39 @@
 .rtl-mode code,
 [dir="rtl"] pre,
 [dir="rtl"] code,
-.rtl-mode pre code {
+.rtl-mode pre code,
+pre,
+code {
   direction: ltr !important;
   text-align: left !important;
   unicode-bidi: embed;
 }
 
-/* Ensure proper alignment in RTL */
-.rtl-mode input,
+/* Keep input areas flexible - only textarea for conversation should be RTL */
+.rtl-mode input {
+  text-align: right;
+}
+
 .rtl-mode textarea {
   text-align: right;
 }
 
-.rtl-mode button {
-  direction: inherit;
+/* Buttons should ALWAYS stay LTR */
+button,
+[role="button"],
+.rtl-mode button,
+[dir="rtl"] button {
+  direction: ltr !important;
+  text-align: center !important;
 }
 
 /* Claude-specific fixes - keep monospace content LTR */
 .rtl-mode .font-mono,
 .rtl-mode .font-code,
 [dir="rtl"] .font-mono,
-[dir="rtl"] .font-code {
+[dir="rtl"] .font-code,
+.font-mono,
+.font-code {
   direction: ltr !important;
   text-align: left !important;
 }
@@ -226,6 +263,12 @@
 .claude-rtl-toggle,
 .claude-rtl-toggle * {
   direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Keep scrollbars in their proper position */
+::-webkit-scrollbar {
+  /* Browsers will auto-adjust based on direction */
 }
 
 /* Responsive design - Even smaller on mobile */
