@@ -205,72 +205,109 @@
       isRTL = rtl;
       const direction = rtl ? 'rtl' : 'ltr';
 
-      // DO NOT apply to body - only to specific content areas!
-      // This prevents breaking the entire layout and navigation
+      // Strategy: Apply RTL broadly to content, then exclude UI elements
+      // This catches all conversations, history, artifacts while preserving layout
 
-      // Specific selectors for CONTENT ONLY (conversations, dialogs, artifacts)
-      // These are more surgical selectors that target only text content areas
+      // First, get the main conversation area and apply broadly
+      const mainContent = document.querySelector('main');
+      if (mainContent) {
+        // Apply to main content container itself
+        mainContent.style.direction = direction;
+        mainContent.setAttribute('dir', direction);
+      }
+
+      // Broad selectors for ALL content (conversations, history, artifacts, dialogs)
       const contentSelectors = [
-        // Message content containers
+        // ALL message-related elements
         '[data-testid*="message"]',
         '[data-testid*="conversation"]',
+        '[class*="message"]',
+        '[class*="Message"]',
         '.font-user-message',
         '.font-claude-message',
 
-        // Dialog content (not the dialog itself, just content)
-        '[role="dialog"] .prose',
-        '[role="dialog"] p',
-        '[role="dialog"] div[class*="text"]',
+        // Main content areas
+        'main',
+        'main > div',
+        'main article',
+        'main section',
 
-        // Text input areas
-        'textarea[placeholder*="Talk"]',
-        'textarea[placeholder*="Reply"]',
+        // Dialog content
+        '[role="dialog"]',
+        '[role="dialog"] *',
+
+        // Text areas
+        'textarea',
         'div[contenteditable="true"]',
 
-        // Artifact content areas
-        '[class*="artifact"] .prose',
-        '[class*="artifact"] p',
+        // All artifacts
+        '[class*="artifact"]',
+        '[class*="Artifact"]',
+        '[class*="artifact"] *',
 
-        // Prose content (main text areas)
-        '.prose p',
-        '.prose div',
+        // History items (conversation list)
+        '[class*="history"]',
+        '[class*="History"]',
+        '[class*="conversation-item"]',
+        '[class*="chat-item"]',
 
-        // Paragraph elements inside main content (but not in nav/sidebar)
-        'main article p',
-        'main article div[class*="text"]',
-        'main [class*="message"] p',
-        'main [class*="message"] div',
-
-        // Search results
-        '[role="search"] + div p',
-        '[class*="search"] p'
+        // Prose and text content
+        '.prose',
+        '.prose *',
+        'p',
+        'div',
+        'span',
+        'article',
+        'section'
       ];
 
-      // Apply direction to content areas only
+      // Apply direction broadly
       contentSelectors.forEach(selector => {
         try {
           const elements = document.querySelectorAll(selector);
           elements.forEach(element => {
-            // Skip if it's part of navigation, sidebar, or toggle button
+            // EXCLUSIONS: Skip these elements to preserve UI
+            // Navigation and structural elements
             if (element.id === 'claude-rtl-toggle' ||
                 element.closest('#claude-rtl-toggle') ||
+                element.matches('nav') ||
+                element.matches('nav *') ||
                 element.closest('nav') ||
-                element.closest('[role="navigation"]') ||
-                element.closest('aside') ||
-                element.closest('button') ||
-                element.closest('[class*="sidebar"]') ||
-                element.closest('[class*="menu"]')) {
+                element.matches('[role="navigation"]') ||
+                element.matches('[role="navigation"] *') ||
+                element.matches('header') ||
+                element.matches('header *') ||
+                element.matches('footer') ||
+                element.matches('footer *')) {
               return;
             }
 
-            // Skip if it's a code block
-            if (element.tagName === 'PRE' ||
-                element.tagName === 'CODE' ||
+            // Skip buttons (but not their containers)
+            if (element.matches('button') ||
+                element.matches('[role="button"]') ||
+                element.matches('button *') ||
+                element.matches('[role="button"] *')) {
+              return;
+            }
+
+            // Skip code blocks
+            if (element.matches('pre') ||
+                element.matches('code') ||
+                element.matches('pre *') ||
+                element.matches('code *') ||
                 element.closest('pre') ||
                 element.closest('code')) {
               return;
             }
 
+            // Skip input controls (but allow textarea for chat)
+            if ((element.matches('input') && element.type !== 'text') ||
+                element.matches('select') ||
+                element.matches('option')) {
+              return;
+            }
+
+            // Apply direction
             element.style.direction = direction;
             element.setAttribute('dir', direction);
 

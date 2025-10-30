@@ -181,33 +181,58 @@
   opacity: 1;
 }
 
-/* RTL mode adjustments - ONLY for text content */
+/* RTL mode adjustments - for content text */
 .rtl-mode {
   text-align: right !important;
 }
 
-/* IMPORTANT: Keep UI elements and navigation LTR */
-/* This prevents breaking the layout */
+/* CRITICAL: Keep UI elements and navigation LTR */
+/* These rules MUST override any RTL applied to prevent layout breaking */
 nav,
+nav *,
 [role="navigation"],
+[role="navigation"] *,
 aside,
+aside *,
 [class*="sidebar"],
+[class*="sidebar"] *,
+[class*="Sidebar"],
+[class*="Sidebar"] *,
 [class*="menu"],
+[class*="menu"] *,
+[class*="Menu"],
+[class*="Menu"] *,
 button,
+button *,
 [role="button"],
+[role="button"] *,
 header,
+header *,
 footer,
+footer *,
 [class*="toolbar"],
-[class*="navigation"] {
+[class*="toolbar"] *,
+[class*="Toolbar"],
+[class*="Toolbar"] *,
+[class*="navigation"],
+[class*="navigation"] *,
+[class*="Navigation"],
+[class*="Navigation"] *,
+[type="submit"],
+[type="button"],
+[class*="icon"],
+[class*="Icon"],
+svg:not(.icon-ltr):not(.icon-rtl) {
   direction: ltr !important;
   text-align: left !important;
 }
 
-/* Keep body and main structural elements LTR */
+/* Keep body LTR - main will handle content direction */
 body,
 html,
 #root,
-[id*="app"] {
+[id*="app"],
+[id*="App"] {
   direction: ltr !important;
 }
 
